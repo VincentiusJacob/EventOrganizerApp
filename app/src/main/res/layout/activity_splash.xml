@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#346751"
+    android:gravity="center"
+    tools:context=".SplashActivity">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="19dp"
+        android:text="Maison Evene"
+        android:textColor="@color/white"
+        android:textAlignment="center"
+        android:textSize="50dp"
+        android:fontFamily="@font/great_vibes"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/subtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/title"
+        android:text="Craft and Celebrate Unforgettable Moments"
+        android:textColor="@color/white"
+        android:textAlignment="center"
+        android:textSize="18dp"
+        android:fontFamily="@font/playfairdisplayitalic"/>
+
+</RelativeLayout>

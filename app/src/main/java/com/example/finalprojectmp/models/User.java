@@ -116,8 +116,8 @@ public abstract class User implements Serializable {
         return isActive;
     }
 
-    public void setActive(boolean active) {
-        isActive = active;
+    public void setIsActive(boolean isActive) {
+        this.isActive = isActive;
     }
 
     @Override

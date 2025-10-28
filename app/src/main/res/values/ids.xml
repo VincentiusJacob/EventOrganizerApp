@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="splash_logo" type="id" />
+    <item name="editTextName" type="id" />
+    <item name="editTextEmail" type="id" />
+    <item name="editTextPassword" type="id" />
+    <item name="buttonLogin" type="id" />
+    <item name="textViewRegister" type="id" />
+    <item name="editTextPhone" type="id" />
+    <item name="radioGroupUserType" type="id" />
+    <item name="radioButtonParticipant" type="id" />
+    <item name="radioButtonOrganizer" type="id" />
+    <item name="buttonRegister" type="id" />
+    <item name="textViewLogin" type="id" />
+</resources>

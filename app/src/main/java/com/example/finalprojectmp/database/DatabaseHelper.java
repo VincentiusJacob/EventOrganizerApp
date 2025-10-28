@@ -4,6 +4,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import com.example.finalprojectmp.models.Organizer;
+import com.example.finalprojectmp.models.Participant;
+import com.example.finalprojectmp.models.User;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -352,5 +357,181 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         Date date = new Date();
         return dateFormat.format(date);
+    }
+
+    // Helper to get user email buat login
+    public User getUserByEmail(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM \" + TABLE_USERS + \" WHERE \" + KEY_EMAIL + \" = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{email});
+
+        if (cursor.moveToFirst()) {
+            int id = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_ID));
+            String name = cursor.getString(cursor.getColumnIndexOrThrow(KEY_NAME));
+            String userEmail = cursor.getString(cursor.getColumnIndexOrThrow(KEY_EMAIL));
+            String password = cursor.getString(cursor.getColumnIndexOrThrow(KEY_PASSWORD));
+            String phone = cursor.getString(cursor.getColumnIndexOrThrow(KEY_PHONE_NUMBER));
+            String userType = cursor.getString(cursor.getColumnIndexOrThrow(KEY_USER_TYPE));
+
+            User user = null;
+            if ("participant".equals(userType)) {
+                user = getParticipantById(id);
+            } else if ("organizer".equals(userType)) {
+                user = getOrganizerById(id);
+            }
+
+            cursor.close();
+            return user;
+        }
+
+        cursor.close();
+        return null;
+    }
+
+    // Helper buat insert participant
+    public long insertParticipant(Participant participant) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues userValues = new ContentValues();
+        userValues.put(KEY_NAME, participant.getName());
+        userValues.put(KEY_EMAIL, participant.getEmail());
+        userValues.put(KEY_PASSWORD, participant.getPassword());
+        userValues.put(KEY_PHONE_NUMBER, participant.getPhoneNumber());
+        userValues.put(KEY_USER_TYPE, "participant");
+        userValues.put(KEY_IS_ACTIVE, participant.isActive() ? 1 : 0);
+
+        long userId = db.insert(TABLE_USERS, null, userValues);
+
+        if (userId != -1) {
+            ContentValues partValues = new ContentValues();
+            partValues.put(KEY_USER_ID, userId);
+            partValues.put(KEY_INTERESTS, participant.getInterests());
+            partValues.put(KEY_DIETARY_PREFERENCES, participant.getDietaryPreferences());
+            partValues.put(KEY_EMERGENCY_CONTACT, participant.getEmergencyContact());
+            partValues.put(KEY_EMERGENCY_CONTACT_PHONE, participant.getEmergencyContactPhone());
+            partValues.put(KEY_TOTAL_EVENTS_ATTENDED, participant.getTotalEventsAttended());
+            partValues.put(KEY_TOTAL_RSVPS, participant.getTotalRsvps());
+            partValues.put(KEY_ATTENDANCE_RATE, participant.getAttendanceRate());
+            partValues.put(KEY_PREFERRED_EVENT_TYPES, participant.getPreferredEventTypes());
+            partValues.put(KEY_EMAIL_NOTIFICATIONS, participant.isEmailNotifications() ? 1 : 0);
+            partValues.put(KEY_SMS_NOTIFICATIONS, participant.isSmsNotifications() ? 1 : 0);
+
+            db.insert(TABLE_PARTICIPANTS, null, partValues);
+        }
+
+        return userId;
+    }
+
+    // Helper buat insert Organizer
+    public long insertOrganizer(Organizer organizer) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues userValues = new ContentValues();
+        userValues.put(KEY_NAME, organizer.getName());
+        userValues.put(KEY_EMAIL, organizer.getEmail());
+        userValues.put(KEY_PASSWORD, organizer.getPassword());
+        userValues.put(KEY_PHONE_NUMBER, organizer.getPhoneNumber());
+        userValues.put(KEY_USER_TYPE, "organizer");
+        userValues.put(KEY_IS_ACTIVE, organizer.isActive() ? 1 : 0);
+
+        long userId = db.insert(TABLE_USERS, null, userValues);
+
+        if (userId != -1) {
+            ContentValues orgValues = new ContentValues();
+            orgValues.put(KEY_USER_ID, userId);
+            orgValues.put(KEY_ORGANIZATION_NAME, organizer.getOrganizationName());
+            orgValues.put(KEY_ORGANIZATION_TYPE, organizer.getOrganizationType());
+            orgValues.put(KEY_ORGANIZATION_ADDRESS, organizer.getOrganizationAddress());
+            orgValues.put(KEY_ORGANIZATION_WEBSITE, organizer.getOrganizationWebsite());
+            orgValues.put(KEY_DESIGNATION, organizer.getDesignation());
+            orgValues.put(KEY_DEPARTMENT, organizer.getDepartment());
+            orgValues.put(KEY_TOTAL_EVENTS_CREATED, organizer.getTotalEventsCreated());
+            orgValues.put(KEY_TOTAL_EVENTS_COMPLETED, organizer.getTotalEventsCompleted());
+            orgValues.put(KEY_TOTAL_ATTENDEES_MANAGED, organizer.getTotalAttendeesManaged());
+            orgValues.put(KEY_AVERAGE_EVENT_RATING, organizer.getAverageEventRating());
+            orgValues.put(KEY_IS_VERIFIED, organizer.isVerified() ? 1 : 0);
+            orgValues.put(KEY_VERIFICATION_DATE, organizer.getVerificationDate());
+            orgValues.put(KEY_BANK_ACCOUNT_DETAILS, organizer.getBankAccountDetails());
+            orgValues.put(KEY_TAX_ID, organizer.getTaxId());
+            orgValues.put(KEY_EVENT_BUDGET_LIMIT, organizer.getEventBudgetLimit());
+            orgValues.put(KEY_SPECIALIZATIONS, organizer.getSpecializations());
+
+            db.insert(TABLE_ORGANIZERS, null, orgValues);
+        }
+
+        return userId;
+    }
+
+
+    // Helper buat get participant by id
+    public Participant getParticipantById(int id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_USERS + " u JOIN " + TABLE_PARTICIPANTS + " p ON u." + KEY_ID + " = p." + KEY_USER_ID + " WHERE u." + KEY_ID + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(id)});
+
+        if (cursor.moveToFirst()) {
+            Participant participant = new Participant();
+            participant.setId(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_ID)));
+            participant.setName(cursor.getString(cursor.getColumnIndexOrThrow(KEY_NAME)));
+            participant.setEmail(cursor.getString(cursor.getColumnIndexOrThrow(KEY_EMAIL)));
+            participant.setPassword(cursor.getString(cursor.getColumnIndexOrThrow(KEY_PASSWORD)));
+            participant.setPhoneNumber(cursor.getString(cursor.getColumnIndexOrThrow(KEY_PHONE_NUMBER)));
+            participant.setIsActive(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_IS_ACTIVE)) == 1);
+            participant.setInterests(cursor.getString(cursor.getColumnIndexOrThrow(KEY_INTERESTS)));
+            participant.setDietaryPreferences(cursor.getString(cursor.getColumnIndexOrThrow(KEY_DIETARY_PREFERENCES)));
+            participant.setEmergencyContact(cursor.getString(cursor.getColumnIndexOrThrow(KEY_EMERGENCY_CONTACT)));
+            participant.setEmergencyContactPhone(cursor.getString(cursor.getColumnIndexOrThrow(KEY_EMERGENCY_CONTACT_PHONE)));
+            participant.setTotalEventsAttended(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_TOTAL_EVENTS_ATTENDED)));
+            participant.setTotalRsvps(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_TOTAL_RSVPS)));
+            participant.setAttendanceRate(cursor.getFloat(cursor.getColumnIndexOrThrow(KEY_ATTENDANCE_RATE)));
+            participant.setPreferredEventTypes(cursor.getString(cursor.getColumnIndexOrThrow(KEY_PREFERRED_EVENT_TYPES)));
+            participant.setEmailNotifications(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_EMAIL_NOTIFICATIONS)) == 1);
+            participant.setSmsNotifications(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_SMS_NOTIFICATIONS)) == 1);
+
+            cursor.close();
+            return participant;
+        }
+
+        cursor.close();
+        return null;
+    }
+
+    // Helper buat get Organizer by id
+    public Organizer getOrganizerById(int id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_USERS + " u JOIN " + TABLE_ORGANIZERS + " o ON u." + KEY_ID + " = o." + KEY_USER_ID + " WHERE u." + KEY_ID + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(id)});
+
+        if (cursor.moveToFirst()) {
+            Organizer organizer = new Organizer();
+            organizer.setId(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_ID)));
+            organizer.setName(cursor.getString(cursor.getColumnIndexOrThrow(KEY_NAME)));
+            organizer.setEmail(cursor.getString(cursor.getColumnIndexOrThrow(KEY_EMAIL)));
+            organizer.setPassword(cursor.getString(cursor.getColumnIndexOrThrow(KEY_PASSWORD)));
+            organizer.setPhoneNumber(cursor.getString(cursor.getColumnIndexOrThrow(KEY_PHONE_NUMBER)));
+            organizer.setIsActive(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_IS_ACTIVE)) == 1);
+            organizer.setOrganizationName(cursor.getString(cursor.getColumnIndexOrThrow(KEY_ORGANIZATION_NAME)));
+            organizer.setOrganizationType(cursor.getString(cursor.getColumnIndexOrThrow(KEY_ORGANIZATION_TYPE)));
+            organizer.setOrganizationAddress(cursor.getString(cursor.getColumnIndexOrThrow(KEY_ORGANIZATION_ADDRESS)));
+            organizer.setOrganizationWebsite(cursor.getString(cursor.getColumnIndexOrThrow(KEY_ORGANIZATION_WEBSITE)));
+            organizer.setDesignation(cursor.getString(cursor.getColumnIndexOrThrow(KEY_DESIGNATION)));
+            organizer.setDepartment(cursor.getString(cursor.getColumnIndexOrThrow(KEY_DEPARTMENT)));
+            organizer.setTotalEventsCreated(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_TOTAL_EVENTS_CREATED)));
+            organizer.setTotalEventsCompleted(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_TOTAL_EVENTS_COMPLETED)));
+            organizer.setTotalAttendeesManaged(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_TOTAL_ATTENDEES_MANAGED)));
+            organizer.setAverageEventRating(cursor.getFloat(cursor.getColumnIndexOrThrow(KEY_AVERAGE_EVENT_RATING)));
+            organizer.setVerified(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_IS_VERIFIED)) == 1);
+            organizer.setVerificationDate(cursor.getString(cursor.getColumnIndexOrThrow(KEY_VERIFICATION_DATE)));
+            organizer.setBankAccountDetails(cursor.getString(cursor.getColumnIndexOrThrow(KEY_BANK_ACCOUNT_DETAILS)));
+            organizer.setTaxId(cursor.getString(cursor.getColumnIndexOrThrow(KEY_TAX_ID)));
+            organizer.setEventBudgetLimit(cursor.getDouble(cursor.getColumnIndexOrThrow(KEY_EVENT_BUDGET_LIMIT)));
+            organizer.setSpecializations(cursor.getString(cursor.getColumnIndexOrThrow(KEY_SPECIALIZATIONS)));
+
+            cursor.close();
+            return organizer;
+        }
+
+        cursor.close();
+        return null;
     }
 }
