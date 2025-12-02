@@ -1,3 +1,73 @@
 <resources>
     <string name="app_name">FinalProjectMP</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_events">RSVP</string>
+    <string name="nav_qr">QR Codes</string>
+    <string name="nav_profile">Profile</string>
+
+    <!-- Titles -->
+    <string name="title_participant_dashboard">Participant Dashboard</string>
+    <string name="title_events">Events</string>
+    <string name="title_event_detail">Event Detail</string>
+    <string name="title_qr_codes">My QR Codes</string>
+    <string name="title_qr_detail">QR Code</string>
+    <string name="title_profile">My Profile</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_greeting">Hi, %1$s</string>
+    <string name="dashboard_dietary_empty">Tap to add your dietary preference</string>
+    <string name="dashboard_upcoming_label">%1$d upcoming events</string>
+    <string name="dashboard_rsvp_label">%1$d confirmed RSVP</string>
+    <string name="dashboard_no_next_event">No upcoming events yet</string>
+    <string name="dashboard_start_rsvping">Browse the RSVP tab to get started</string>
+    <string name="dashboard_section_upcoming">Upcoming highlights</string>
+    <string name="dashboard_dietary_label">Dietary preference</string>
+    <string name="dashboard_next_event">Next RSVP</string>
+
+    <string name="chip_past">Past</string>
+    <string name="chip_current">Today</string>
+    <string name="chip_upcoming">Upcoming</string>
+    <string name="events_empty_state">No events to show here yet.</string>
+    <string name="qr_empty_state">RSVP to an event to unlock your QR code.</string>
+
+    <!-- Events -->
+    <string name="event_list_organizer">Hosted by %1$s</string>
+    <string name="label_unknown_organizer">Organizer</string>
+    <string name="event_attendance_stat">%1$d RSVP • %2$d checked in</string>
+    <string name="event_full_datetime">%1$s • %2$s</string>
+    <string name="event_description_empty">Description coming soon.</string>
+    <string name="button_view_qr">View QR</string>
+    <string name="button_rsvp_now">RSVP</string>
+    <string name="button_view_details">Details</string>
+    <string name="button_cancel_rsvp">Cancel RSVP</string>
+    <string name="rsvp_successful">You\'re on the list! 🎉</string>
+    <string name="rsvp_failed">Couldn\'t update RSVP. Please try again.</string>
+    <string name="rsvp_cancelled">RSVP cancelled</string>
+
+    <!-- Errors -->
+    <string name="error_event_missing">Event is no longer available.</string>
+    <string name="error_qr_missing">QR code not ready yet.</string>
+    <string name="error_qr_generation">Unable to render QR code.</string>
+    <string name="error_missing_user_id">Can\'t find your session. Please log in again.</string>
+
+    <!-- QR -->
+    <string name="qr_payload_label">Payload</string>
+
+    <!-- Profile -->
+    <string name="profile_dietary_hint">e.g., Vegetarian, No nuts</string>
+    <string name="profile_dietary_updated">Dietary preference saved</string>
+    <string name="profile_dietary_failed">Couldn\'t save preference</string>
+    <string name="profile_save_button">Save Preference</string>
+    <string name="profile_section_preferences">Preferences</string>
+    <string name="profile_interests_label">Interests</string>
+    <string name="profile_interests_hint">e.g., Technology, Music</string>
+    <string name="profile_email_notifications">Email notifications</string>
+    <string name="profile_sms_notifications">SMS notifications</string>
+    <string name="profile_log_out">Log out</string>
+    <string name="description">Description</string>
+    <string name="_0">0</string>
+    <string name="qr_code">QR code</string>
+    <string name="calendar">calendar</string>
 </resources>

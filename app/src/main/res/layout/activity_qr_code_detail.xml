@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp"
+    android:background="@color/surfaceBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:id="@+id/textQrTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textSize="24sp"
+            android:textColor="@color/black"
+            tools:text="Innovation Summit" />
+
+        <TextView
+            android:id="@+id/textQrDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"
+            android:textColor="@color/textSecondary"
+            tools:text="Mon, Oct 7 • 09:00" />
+
+        <ImageView
+            android:id="@+id/imageQrCode"
+            android:layout_width="260dp"
+            android:layout_height="260dp"
+            android:layout_marginTop="24dp"
+            android:contentDescription="@string/qr_code"
+            android:background="@drawable/bg_nav_item"
+            android:padding="16dp"
+            tools:srcCompat="@drawable/ic_nav_qr" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/qr_payload_label"
+            android:textColor="@color/textSecondary"
+            android:textSize="12sp"
+            android:paddingTop="24dp" />
+
+        <TextView
+            android:id="@+id/textQrPayload"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:typeface="monospace"
+            android:paddingTop="4dp"
+            tools:text="EVENT:1|USER:2|TS:123" />
+    </LinearLayout>
+</ScrollView>

@@ -2,22 +2,30 @@ package com.example.finalprojectmp.database;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.example.finalprojectmp.models.Event;
 import com.example.finalprojectmp.models.Organizer;
 import com.example.finalprojectmp.models.Participant;
+import com.example.finalprojectmp.models.QRCode;
+import com.example.finalprojectmp.models.Rsvp;
 import com.example.finalprojectmp.models.User;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     // Database Info
     private static final String DATABASE_NAME = "EventManagementDB";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
 
     // Table Names
     public static final String TABLE_USERS = "users";
@@ -237,6 +245,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (instance == null) {
             instance = new DatabaseHelper(context.getApplicationContext());
         }
+        instance.ensureSeedData();
         return instance;
     }
 
@@ -325,6 +334,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         partValues.put(KEY_EMERGENCY_CONTACT, "Jane Doe");
         partValues.put(KEY_EMERGENCY_CONTACT_PHONE, "555-0123");
         db.insert(TABLE_PARTICIPANTS, null, partValues);
+
+        insertSampleEvents(db, adminId, participantId);
     }
 
     // Insert sample food items
@@ -351,6 +362,97 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    private void insertSampleEvents(SQLiteDatabase db, long organizerId, long participantId) {
+        if (organizerId <= 0) {
+            return;
+        }
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        long innovationSummitId = insertEvent(db, organizerId,
+                "Innovation Summit",
+                dateFormat.format(calendar.getTime()),
+                "09:00",
+                "Morning conference that highlights the latest campus projects and provides networking opportunities.");
+
+        calendar.add(Calendar.DAY_OF_MONTH, 3);
+        long foodFestivalId = insertEvent(db, organizerId,
+                "Campus Food Festival",
+                dateFormat.format(calendar.getTime()),
+                "17:30",
+                "Tasting booths from every student community with live acoustic performances and games.");
+
+        calendar.add(Calendar.DAY_OF_MONTH, -7);
+        long alumniNightId = insertEvent(db, organizerId,
+                "Alumni Networking Night",
+                dateFormat.format(calendar.getTime()),
+                "19:00",
+                "Panel talks and speed mentoring sessions between alumni and current students.");
+
+        if (participantId > 0 && innovationSummitId > 0) {
+            insertSampleRsvp(db, participantId, innovationSummitId);
+        }
+
+        if (participantId > 0 && foodFestivalId > 0) {
+            insertSampleRsvp(db, participantId, foodFestivalId);
+        }
+    }
+
+    private long insertEvent(SQLiteDatabase db, long organizerId, String title, String date, String time, String description) {
+        ContentValues values = new ContentValues();
+        values.put(KEY_TITLE, title);
+        values.put(KEY_DATE, date);
+        values.put(KEY_TIME, time);
+        values.put(KEY_DESCRIPTION, description);
+        values.put(KEY_CREATED_BY, organizerId);
+        values.put(KEY_CREATED_AT, getDateTime());
+        values.put(KEY_UPDATED_AT, getDateTime());
+        return db.insert(TABLE_EVENTS, null, values);
+    }
+
+    private void insertSampleRsvp(SQLiteDatabase db, long participantId, long eventId) {
+        ContentValues rsvpValues = new ContentValues();
+        rsvpValues.put(KEY_USER_ID, participantId);
+        rsvpValues.put(KEY_EVENT_ID, eventId);
+        rsvpValues.put(KEY_STATUS, Rsvp.STATUS_CONFIRMED);
+        rsvpValues.put(KEY_CREATED_AT, getDateTime());
+        rsvpValues.put(KEY_UPDATED_AT, getDateTime());
+        db.insert(TABLE_RSVPS, null, rsvpValues);
+
+        ensureQrCode(db, (int) participantId, (int) eventId);
+    }
+
+    private void ensureQrCode(SQLiteDatabase db, int userId, int eventId) {
+        Cursor cursor = db.query(TABLE_QRCODES, null,
+                KEY_USER_ID + "=? AND " + KEY_EVENT_ID + "=?",
+                new String[]{String.valueOf(userId), String.valueOf(eventId)},
+                null, null, null);
+
+        boolean exists = cursor.moveToFirst();
+        cursor.close();
+
+        if (!exists) {
+            ContentValues qrValues = new ContentValues();
+            qrValues.put(KEY_USER_ID, userId);
+            qrValues.put(KEY_EVENT_ID, eventId);
+            qrValues.put(KEY_CODE_TEXT, generateQrPayload(userId, eventId));
+            qrValues.put(KEY_CREATED_AT, getDateTime());
+            db.insert(TABLE_QRCODES, null, qrValues);
+        }
+    }
+
+    private String generateQrPayload(int userId, int eventId) {
+        return "EVENT:" + eventId + "|USER:" + userId + "|TS:" + System.currentTimeMillis() + "|KEY:" + UUID.randomUUID();
+    }
+
+    private void ensureQrCodeForRsvp(int userId, int eventId) {
+        SQLiteDatabase db = getWritableDatabase();
+        ensureQrCode(db, userId, eventId);
+    }
+
     // Helper method to get datetime
     public String getDateTime() {
         SimpleDateFormat dateFormat = new SimpleDateFormat(
@@ -362,7 +464,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // Helper to get user email buat login
     public User getUserByEmail(String email) {
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT * FROM \" + TABLE_USERS + \" WHERE \" + KEY_EMAIL + \" = ?";
+        String query = "SELECT * FROM " + TABLE_USERS + " WHERE " + KEY_EMAIL + " = ?";
         Cursor cursor = db.rawQuery(query, new String[]{email});
 
         if (cursor.moveToFirst()) {
@@ -386,6 +488,234 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         cursor.close();
         return null;
+    }
+
+    public List<Event> getEventsForParticipant(int userId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT e.*, u." + KEY_NAME + " AS organizer_name," +
+                " (SELECT COUNT(*) FROM " + TABLE_RSVPS + " r WHERE r." + KEY_EVENT_ID + " = e." + KEY_ID +
+                " AND r." + KEY_STATUS + " = '" + Rsvp.STATUS_CONFIRMED + "') AS total_rsvp," +
+                " (SELECT COUNT(*) FROM " + TABLE_ATTENDANCE + " a WHERE a." + KEY_EVENT_ID + " = e." + KEY_ID +
+                " AND a." + KEY_CHECKED_IN + " = 1) AS total_checked_in," +
+                " (SELECT COUNT(*) FROM " + TABLE_RSVPS + " my WHERE my." + KEY_EVENT_ID + " = e." + KEY_ID +
+                " AND my." + KEY_USER_ID + " = ? AND my." + KEY_STATUS + " = '" + Rsvp.STATUS_CONFIRMED + "') AS has_rsvp" +
+                " FROM " + TABLE_EVENTS + " e" +
+                " LEFT JOIN " + TABLE_USERS + " u ON u." + KEY_ID + " = e." + KEY_CREATED_BY +
+                " ORDER BY e." + KEY_DATE + ", e." + KEY_TIME;
+
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+        List<Event> events = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            events.add(mapEventFromCursor(cursor));
+        }
+        cursor.close();
+        return events;
+    }
+
+    public Event getEventById(int eventId, int userId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT e.*, u." + KEY_NAME + " AS organizer_name," +
+                " (SELECT COUNT(*) FROM " + TABLE_RSVPS + " r WHERE r." + KEY_EVENT_ID + " = e." + KEY_ID +
+                " AND r." + KEY_STATUS + " = '" + Rsvp.STATUS_CONFIRMED + "') AS total_rsvp," +
+                " (SELECT COUNT(*) FROM " + TABLE_ATTENDANCE + " a WHERE a." + KEY_EVENT_ID + " = e." + KEY_ID +
+                " AND a." + KEY_CHECKED_IN + " = 1) AS total_checked_in," +
+                " (SELECT COUNT(*) FROM " + TABLE_RSVPS + " my WHERE my." + KEY_EVENT_ID + " = e." + KEY_ID +
+                " AND my." + KEY_USER_ID + " = ? AND my." + KEY_STATUS + " = '" + Rsvp.STATUS_CONFIRMED + "') AS has_rsvp" +
+                " FROM " + TABLE_EVENTS + " e" +
+                " LEFT JOIN " + TABLE_USERS + " u ON u." + KEY_ID + " = e." + KEY_CREATED_BY +
+                " WHERE e." + KEY_ID + " = ?";
+
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId), String.valueOf(eventId)});
+        Event event = null;
+        if (cursor.moveToFirst()) {
+            event = mapEventFromCursor(cursor);
+        }
+        cursor.close();
+        return event;
+    }
+
+    private Event mapEventFromCursor(Cursor cursor) {
+        Event event = new Event();
+        event.setId(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_ID)));
+        event.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(KEY_TITLE)));
+        event.setDate(cursor.getString(cursor.getColumnIndexOrThrow(KEY_DATE)));
+        event.setTime(cursor.getString(cursor.getColumnIndexOrThrow(KEY_TIME)));
+        event.setDescription(cursor.getString(cursor.getColumnIndexOrThrow(KEY_DESCRIPTION)));
+        event.setCreatedBy(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_CREATED_BY)));
+        int organizerIndex = cursor.getColumnIndex("organizer_name");
+        if (organizerIndex >= 0) {
+            event.setOrganizerName(cursor.getString(organizerIndex));
+        }
+        int totalRsvpIndex = cursor.getColumnIndex("total_rsvp");
+        if (totalRsvpIndex >= 0) {
+            event.setTotalRsvp(cursor.getInt(totalRsvpIndex));
+        }
+        int checkedInIndex = cursor.getColumnIndex("total_checked_in");
+        if (checkedInIndex >= 0) {
+            event.setTotalCheckedIn(cursor.getInt(checkedInIndex));
+        }
+        int hasRsvpIndex = cursor.getColumnIndex("has_rsvp");
+        if (hasRsvpIndex >= 0) {
+            event.setUserHasRsvp(cursor.getInt(hasRsvpIndex) > 0);
+        }
+        return event;
+    }
+
+    public boolean setRsvpStatus(int userId, int eventId, String status) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_USER_ID, userId);
+        values.put(KEY_EVENT_ID, eventId);
+        values.put(KEY_STATUS, status);
+        values.put(KEY_UPDATED_AT, getDateTime());
+        values.put(KEY_CREATED_AT, getDateTime());
+
+        long insertResult = db.insertWithOnConflict(TABLE_RSVPS, null, values, SQLiteDatabase.CONFLICT_IGNORE);
+        boolean success;
+        if (insertResult == -1) {
+            ContentValues updateValues = new ContentValues();
+            updateValues.put(KEY_STATUS, status);
+            updateValues.put(KEY_UPDATED_AT, getDateTime());
+            int rows = db.update(TABLE_RSVPS, updateValues,
+                    KEY_USER_ID + "=? AND " + KEY_EVENT_ID + "=?",
+                    new String[]{String.valueOf(userId), String.valueOf(eventId)});
+            success = rows > 0;
+        } else {
+            success = true;
+        }
+
+        if (success && Rsvp.STATUS_CONFIRMED.equals(status)) {
+            ensureQrCodeForRsvp(userId, eventId);
+        }
+
+        return success;
+    }
+
+    public Rsvp getRsvpForEvent(int userId, int eventId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT r.*, e." + KEY_TITLE + " AS event_title, e." + KEY_DATE + " AS event_date, e." + KEY_TIME + " AS event_time" +
+                " FROM " + TABLE_RSVPS + " r" +
+                " JOIN " + TABLE_EVENTS + " e ON e." + KEY_ID + " = r." + KEY_EVENT_ID +
+                " WHERE r." + KEY_USER_ID + " = ? AND r." + KEY_EVENT_ID + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId), String.valueOf(eventId)});
+        Rsvp rsvp = null;
+        if (cursor.moveToFirst()) {
+            rsvp = mapRsvpFromCursor(cursor);
+        }
+        cursor.close();
+        return rsvp;
+    }
+
+    public List<Rsvp> getRsvpsForUser(int userId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT r.*, e." + KEY_TITLE + " AS event_title, e." + KEY_DATE + " AS event_date, e." + KEY_TIME + " AS event_time" +
+                " FROM " + TABLE_RSVPS + " r" +
+                " JOIN " + TABLE_EVENTS + " e ON e." + KEY_ID + " = r." + KEY_EVENT_ID +
+                " WHERE r." + KEY_USER_ID + " = ?" +
+                " ORDER BY e." + KEY_DATE + ", e." + KEY_TIME;
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+        List<Rsvp> rsvps = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            rsvps.add(mapRsvpFromCursor(cursor));
+        }
+        cursor.close();
+        return rsvps;
+    }
+
+    private Rsvp mapRsvpFromCursor(Cursor cursor) {
+        Rsvp rsvp = new Rsvp();
+        rsvp.setId(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_ID)));
+        rsvp.setUserId(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_USER_ID)));
+        rsvp.setEventId(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_EVENT_ID)));
+        rsvp.setStatus(cursor.getString(cursor.getColumnIndexOrThrow(KEY_STATUS)));
+        int eventTitleIndex = cursor.getColumnIndex("event_title");
+        if (eventTitleIndex >= 0) {
+            rsvp.setEventTitle(cursor.getString(eventTitleIndex));
+        }
+        int eventDateIndex = cursor.getColumnIndex("event_date");
+        if (eventDateIndex >= 0) {
+            rsvp.setEventDate(cursor.getString(eventDateIndex));
+        }
+        int eventTimeIndex = cursor.getColumnIndex("event_time");
+        if (eventTimeIndex >= 0) {
+            rsvp.setEventTime(cursor.getString(eventTimeIndex));
+        }
+        return rsvp;
+    }
+
+    public List<QRCode> getQrCodesForUser(int userId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT q.*, e." + KEY_TITLE + " AS event_title, e." + KEY_DATE + " AS event_date, e." + KEY_TIME + " AS event_time" +
+                " FROM " + TABLE_QRCODES + " q" +
+                " JOIN " + TABLE_EVENTS + " e ON e." + KEY_ID + " = q." + KEY_EVENT_ID +
+                " WHERE q." + KEY_USER_ID + " = ?" +
+                " ORDER BY e." + KEY_DATE + ", e." + KEY_TIME;
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+        List<QRCode> codes = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            codes.add(mapQrCodeFromCursor(cursor));
+        }
+        cursor.close();
+        return codes;
+    }
+
+    public QRCode getOrCreateQrCode(int userId, int eventId) {
+        QRCode qrCode = fetchQrCode(userId, eventId);
+        if (qrCode == null) {
+            ensureQrCodeForRsvp(userId, eventId);
+            qrCode = fetchQrCode(userId, eventId);
+        }
+        return qrCode;
+    }
+
+    private QRCode fetchQrCode(int userId, int eventId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT q.*, e." + KEY_TITLE + " AS event_title, e." + KEY_DATE + " AS event_date, e." + KEY_TIME + " AS event_time" +
+                " FROM " + TABLE_QRCODES + " q" +
+                " JOIN " + TABLE_EVENTS + " e ON e." + KEY_ID + " = q." + KEY_EVENT_ID +
+                " WHERE q." + KEY_USER_ID + " = ? AND q." + KEY_EVENT_ID + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId), String.valueOf(eventId)});
+        QRCode qrCode = null;
+        if (cursor.moveToFirst()) {
+            qrCode = mapQrCodeFromCursor(cursor);
+        }
+        cursor.close();
+        return qrCode;
+    }
+
+    private QRCode mapQrCodeFromCursor(Cursor cursor) {
+        QRCode qrCode = new QRCode();
+        qrCode.setId(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_ID)));
+        qrCode.setUserId(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_USER_ID)));
+        qrCode.setEventId(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_EVENT_ID)));
+        qrCode.setCodeText(cursor.getString(cursor.getColumnIndexOrThrow(KEY_CODE_TEXT)));
+        int eventTitleIndex = cursor.getColumnIndex("event_title");
+        if (eventTitleIndex >= 0) {
+            qrCode.setEventTitle(cursor.getString(eventTitleIndex));
+        }
+        int eventDateIndex = cursor.getColumnIndex("event_date");
+        if (eventDateIndex >= 0) {
+            qrCode.setEventDate(cursor.getString(eventDateIndex));
+        }
+        int eventTimeIndex = cursor.getColumnIndex("event_time");
+        if (eventTimeIndex >= 0) {
+            qrCode.setEventTime(cursor.getString(eventTimeIndex));
+        }
+        return qrCode;
+    }
+
+    public boolean updateParticipantProfile(int userId, String dietaryPreference, String interests,
+                                             boolean emailNotif, boolean smsNotif) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_DIETARY_PREFERENCES, dietaryPreference);
+        values.put(KEY_INTERESTS, interests);
+        values.put(KEY_EMAIL_NOTIFICATIONS, emailNotif ? 1 : 0);
+        values.put(KEY_SMS_NOTIFICATIONS, smsNotif ? 1 : 0);
+        int rows = db.update(TABLE_PARTICIPANTS, values,
+                KEY_USER_ID + "=?",
+                new String[]{String.valueOf(userId)});
+        return rows > 0;
     }
 
     // Helper buat insert participant
@@ -533,5 +863,58 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         cursor.close();
         return null;
+    }
+
+    private synchronized void ensureSeedData() {
+        SQLiteDatabase db = getWritableDatabase();
+        if (isTableEmpty(db, TABLE_USERS)) {
+            insertDefaultUsers(db);
+            insertSampleFood(db);
+        }
+
+        long organizerId = getFirstUserIdByType(db, "organizer");
+        long participantId = getFirstUserIdByType(db, "participant");
+        if (organizerId <= 0) {
+            insertDefaultUsers(db);
+            organizerId = getFirstUserIdByType(db, "organizer");
+            participantId = getFirstUserIdByType(db, "participant");
+        }
+
+        if (organizerId > 0 && !hasUpcomingEvents(db)) {
+            insertSampleEvents(db, organizerId, participantId);
+        }
+    }
+
+    private boolean isTableEmpty(SQLiteDatabase db, String tableName) {
+        return DatabaseUtils.queryNumEntries(db, tableName) == 0;
+    }
+
+    private long getFirstUserIdByType(SQLiteDatabase db, String userType) {
+        Cursor cursor = db.rawQuery("SELECT " + KEY_ID + " FROM " + TABLE_USERS +
+                " WHERE " + KEY_USER_TYPE + " = ? LIMIT 1", new String[]{userType});
+        long id = -1;
+        if (cursor.moveToFirst()) {
+            id = cursor.getLong(0);
+        }
+        cursor.close();
+        return id;
+    }
+
+    private boolean hasUpcomingEvents(SQLiteDatabase db) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        Date now = new Date();
+        String today = dateFormat.format(now);
+        String currentTime = timeFormat.format(now);
+        Cursor cursor = db.rawQuery(
+                "SELECT COUNT(*) FROM " + TABLE_EVENTS +
+                        " WHERE " + KEY_DATE + " > ? OR (" + KEY_DATE + " = ? AND " + KEY_TIME + " >= ?)",
+                new String[]{today, today, currentTime});
+        boolean hasUpcoming = false;
+        if (cursor.moveToFirst()) {
+            hasUpcoming = cursor.getInt(0) > 0;
+        }
+        cursor.close();
+        return hasUpcoming;
     }
 }

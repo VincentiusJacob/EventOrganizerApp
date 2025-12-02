@@ -11,6 +11,8 @@ public class QRCode implements Serializable {
     // Additional fields for display
     private String userName;
     private String eventTitle;
+    private String eventDate;
+    private String eventTime;
 
     // Constructors
     public QRCode() {
@@ -77,6 +79,22 @@ public class QRCode implements Serializable {
 
     public void setEventTitle(String eventTitle) {
         this.eventTitle = eventTitle;
+    }
+
+    public String getEventDate() {
+        return eventDate;
+    }
+
+    public void setEventDate(String eventDate) {
+        this.eventDate = eventDate;
+    }
+
+    public String getEventTime() {
+        return eventTime;
+    }
+
+    public void setEventTime(String eventTime) {
+        this.eventTime = eventTime;
     }
 
     @Override

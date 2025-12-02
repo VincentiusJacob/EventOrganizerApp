@@ -1,16 +1,17 @@
-package com.example.finalprojectmp;
+package com.example.finalprojectmp.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import com.example.finalprojectmp.models.User;
 
+import com.example.finalprojectmp.R;
+import com.example.finalprojectmp.models.User;
 import com.example.finalprojectmp.database.DatabaseHelper;
+import com.example.finalprojectmp.utils.SessionManager;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -51,7 +52,12 @@ public class LoginActivity extends AppCompatActivity {
         User user = dbHelper.getUserByEmail(email);
         if (user != null && user.verifyPassword(password)) {
             Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            SessionManager.getInstance(this).saveSession(user.getId(), user.getUserType());
+
+            Class<?> destination = "participant".equals(user.getUserType())
+                    ? ParticipantDashboardActivity.class
+                    : MainActivity.class;
+            Intent intent = new Intent(LoginActivity.this, destination);
             intent.putExtra("USER_ID", user.getId());
             startActivity(intent);
             finish();

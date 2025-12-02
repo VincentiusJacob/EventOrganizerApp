@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bottomNavBar"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_bottom_nav"
+    android:elevation="8dp"
+    android:orientation="horizontal"
+    android:padding="12dp"
+    android:baselineAligned="false"
+    android:gravity="center"
+    android:clipToPadding="false">
+
+    <LinearLayout
+        android:id="@+id/nav_home"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="@drawable/bg_nav_item"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingVertical="8dp"
+        android:paddingHorizontal="4dp">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="@string/nav_home"
+            android:src="@drawable/ic_nav_home"
+            android:duplicateParentState="true"
+            app:tint="@color/nav_item_text" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/nav_home"
+            android:textColor="@color/nav_item_text"
+            android:textSize="12sp"
+            android:duplicateParentState="true"
+            android:paddingTop="4dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/nav_events"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="@drawable/bg_nav_item"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingVertical="8dp"
+        android:paddingHorizontal="4dp">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="@string/calendar"
+            android:src="@drawable/ic_nav_calendar"
+            android:duplicateParentState="true"
+            app:tint="@color/nav_item_text" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/nav_events"
+            android:textColor="@color/nav_item_text"
+            android:textSize="12sp"
+            android:duplicateParentState="true"
+            android:paddingTop="4dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/nav_qr"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="@drawable/bg_nav_item"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingVertical="8dp"
+        android:paddingHorizontal="4dp">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="@string/nav_qr"
+            android:src="@drawable/ic_nav_qr"
+            android:duplicateParentState="true"
+            app:tint="@color/nav_item_text" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/nav_qr"
+            android:textColor="@color/nav_item_text"
+            android:textSize="12sp"
+            android:duplicateParentState="true"
+            android:paddingTop="4dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/nav_profile"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="@drawable/bg_nav_item"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingVertical="8dp"
+        android:paddingHorizontal="4dp">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="@string/nav_profile"
+            android:src="@drawable/ic_nav_profile"
+            android:duplicateParentState="true"
+            app:tint="@color/nav_item_text" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/nav_profile"
+            android:textColor="@color/nav_item_text"
+            android:textSize="12sp"
+            android:duplicateParentState="true"
+            android:paddingTop="4dp" />
+    </LinearLayout>
+</LinearLayout>

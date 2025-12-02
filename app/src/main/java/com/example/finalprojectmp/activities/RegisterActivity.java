@@ -1,8 +1,7 @@
-package com.example.finalprojectmp;
+package com.example.finalprojectmp.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -10,6 +9,8 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.finalprojectmp.R;
 import com.example.finalprojectmp.models.Participant;
 import com.example.finalprojectmp.models.Organizer;
 
@@ -58,7 +59,15 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         int selectedId = radioGroupUserType.getCheckedRadioButtonId();
+        if (selectedId == -1) {
+            Toast.makeText(this, "Please select a role", Toast.LENGTH_SHORT).show();
+            return;
+        }
         RadioButton radioButton = findViewById(selectedId);
+        if (radioButton == null) {
+            Toast.makeText(this, "Please select a role", Toast.LENGTH_SHORT).show();
+            return;
+        }
         String userType = radioButton.getText().toString().toLowerCase();
 
         // validasi email exist or not
