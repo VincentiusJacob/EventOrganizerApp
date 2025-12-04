@@ -9,4 +9,6 @@
     <color name="cardStroke">#FFE0E0E0</color>
     <color name="surfaceBackground">#FFF8F9F9</color>
     <color name="textSecondary">#FF6D6D6D</color>
+    <color name="navBackground">#346751</color>
+    <color name="red">#FF0000</color>
 </resources>

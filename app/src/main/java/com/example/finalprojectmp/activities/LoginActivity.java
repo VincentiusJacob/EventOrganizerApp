@@ -56,7 +56,7 @@ public class LoginActivity extends AppCompatActivity {
 
             Class<?> destination = "participant".equals(user.getUserType())
                     ? ParticipantDashboardActivity.class
-                    : MainActivity.class;
+                    : OrganizerDashboardActivity.class;
             Intent intent = new Intent(LoginActivity.this, destination);
             intent.putExtra("USER_ID", user.getId());
             startActivity(intent);

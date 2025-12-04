@@ -132,8 +132,9 @@
                     android:textColor="#2E7D32"
                     android:fontFamily="sans-serif-medium" />
 
-                <RadioGroup
-                    android:id="@+id/radioGroupUserType"
+                <!-- CHANGED FROM RadioGroup TO LinearLayout -->
+                <LinearLayout
+                    android:id="@+id/containerUserType"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
@@ -179,7 +180,7 @@
                             android:textSize="15sp" />
                     </com.google.android.material.card.MaterialCardView>
 
-                </RadioGroup>
+                </LinearLayout>
 
                 <!-- Register Button -->
                 <com.google.android.material.button.MaterialButton

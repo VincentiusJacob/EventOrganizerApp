@@ -6,6 +6,7 @@ import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.example.finalprojectmp.models.Attendance;
 import com.example.finalprojectmp.models.Event;
 import com.example.finalprojectmp.models.Organizer;
 import com.example.finalprojectmp.models.Participant;
@@ -917,4 +918,158 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return hasUpcoming;
     }
+
+
+    // Helper buat get events by organizer
+    public List<Event> getEventsByOrganizer(int organizerId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_EVENTS +
+                " WHERE " + KEY_CREATED_BY + " = ? ORDER BY " + KEY_DATE + " DESC";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(organizerId)});
+        List<Event> events = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            events.add(mapEventFromCursor(cursor));
+        }
+        cursor.close();
+        return events;
+    }
+
+    // Helper buat organizer update event mereka
+    public boolean updateEvent(Event event) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_TITLE, event.getTitle());
+        values.put(KEY_DATE, event.getDate());
+        values.put(KEY_TIME, event.getTime());
+        values.put(KEY_DESCRIPTION, event.getDescription());
+        values.put(KEY_UPDATED_AT, getDateTime());
+
+        int rows = db.update(TABLE_EVENTS, values, KEY_ID + " = ?",
+                new String[]{String.valueOf(event.getId())});
+        return rows > 0;
+    }
+
+    // Helper buat organizer delete event kalau perlu
+    public boolean deleteEvent(int eventId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_RSVPS, KEY_EVENT_ID + " = ?", new String[]{String.valueOf(eventId)});
+        db.delete(TABLE_QRCODES, KEY_EVENT_ID + " = ?", new String[]{String.valueOf(eventId)});
+        db.delete(TABLE_ATTENDANCE, KEY_EVENT_ID + " = ?", new String[]{String.valueOf(eventId)});
+
+        int rows = db.delete(TABLE_EVENTS, KEY_ID + " = ?", new String[]{String.valueOf(eventId)});
+        return rows > 0;
+    }
+
+    public String checkInUser(int userId, int eventId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        Cursor cursor = db.query(TABLE_RSVPS, null,
+                KEY_USER_ID + "=? AND " + KEY_EVENT_ID + "=? AND " + KEY_STATUS + "=?",
+                new String[]{String.valueOf(userId), String.valueOf(eventId), Rsvp.STATUS_CONFIRMED},
+                null, null, null);
+
+        if (!cursor.moveToFirst()) {
+            cursor.close();
+            return "No confirmed RSVP found for this user.";
+        }
+        cursor.close();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_USER_ID, userId);
+        values.put(KEY_EVENT_ID, eventId);
+        values.put(KEY_CHECKED_IN, 1);
+        values.put(KEY_CHECK_IN_TIME, getDateTime());
+
+        try {
+            long result = db.insertWithOnConflict(TABLE_ATTENDANCE, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+            if (result != -1) return "Success: Check-in Confirmed!";
+        } catch (Exception e) {
+            return "Error updating DB";
+        }
+        return "Check-in Failed";
+    }
+
+    public List<Attendance> getEventAttendanceList(int eventId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT a.*, u." + KEY_NAME + " as user_name " +
+                "FROM " + TABLE_ATTENDANCE + " a " +
+                "JOIN " + TABLE_USERS + " u ON a." + KEY_USER_ID + " = u." + KEY_ID + " " +
+                "WHERE a." + KEY_EVENT_ID + " = ? AND a." + KEY_CHECKED_IN + " = 1";
+
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(eventId)});
+        List<Attendance> list = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            Attendance att = new Attendance();
+            att.setUserId(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_USER_ID)));
+            att.setCheckInTime(cursor.getString(cursor.getColumnIndexOrThrow(KEY_CHECK_IN_TIME)));
+            att.setUserName(cursor.getString(cursor.getColumnIndexOrThrow("user_name")));
+            list.add(att);
+        }
+        cursor.close();
+        return list;
+    }
+
+    public Cursor getAllEventsForSpinner() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT " + KEY_ID + ", " + KEY_TITLE + " FROM " + TABLE_EVENTS + " ORDER BY " + KEY_DATE + " DESC";
+        return db.rawQuery(query, null);
+    }
+
+    public int[] getEventStats(int eventId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        int rsvpCount = 0;
+        int checkedInCount = 0;
+
+        Cursor cursorRSVP = db.rawQuery("SELECT COUNT(*) FROM " + TABLE_RSVPS +
+                        " WHERE " + KEY_EVENT_ID + " = ? AND " + KEY_STATUS + " = ?",
+                new String[]{String.valueOf(eventId), Rsvp.STATUS_CONFIRMED});
+
+        if (cursorRSVP.moveToFirst()) {
+            rsvpCount = cursorRSVP.getInt(0);
+        }
+        cursorRSVP.close();
+
+        Cursor cursorCheckIn = db.rawQuery("SELECT COUNT(*) FROM " + TABLE_ATTENDANCE +
+                        " WHERE " + KEY_EVENT_ID + " = ? AND " + KEY_CHECKED_IN + " = 1",
+                new String[]{String.valueOf(eventId)});
+
+        if (cursorCheckIn.moveToFirst()) {
+            checkedInCount = cursorCheckIn.getInt(0);
+        }
+        cursorCheckIn.close();
+
+        return new int[]{rsvpCount, checkedInCount};
+    }
+
+
+    public String getCheckedInAttendeesString(int eventId) {
+        List<Attendance> attendees = getEventAttendanceList(eventId);
+
+        if (attendees == null || attendees.isEmpty()) {
+            return "Belum ada peserta yang melakukan check-in.";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        int counter = 1;
+        for (Attendance att : attendees) {
+            sb.append(counter++)
+                    .append(". ")
+                    .append(att.getUserName())
+                    .append("\n   Waktu: ")
+                    .append(att.getCheckInTime())
+                    .append("\n\n");
+        }
+        return sb.toString();
+    }
+
+
+    public long createNewEvent(long organizerId, String title, String date, String time, String description) {
+        return insertEvent(this.getWritableDatabase(), organizerId, title, date, time, description);
+    }
+
+
+
+
+
+
 }

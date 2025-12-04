@@ -22,7 +22,7 @@ public class SplashActivity extends AppCompatActivity {
             Intent intent;
             if (sessionManager.isLoggedIn()) {
                 String type = sessionManager.getUserType();
-                Class<?> destination = "participant".equals(type) ? ParticipantDashboardActivity.class : MainActivity.class;
+                Class<?> destination = "participant".equals(type) ? ParticipantDashboardActivity.class : OrganizerDashboardActivity.class;
                 intent = new Intent(SplashActivity.this, destination);
                 intent.putExtra("USER_ID", sessionManager.getUserId());
             } else {
