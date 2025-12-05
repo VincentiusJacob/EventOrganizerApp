@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_food_row"
+    android:padding="16dp"
+    android:layout_marginBottom="12dp">
+
+    <TextView
+        android:id="@+id/textFoodName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:text="Food Name" />
+
+    <TextView
+        android:id="@+id/textFoodMeta"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/textSecondary"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        android:paddingTop="2dp"
+        android:text="Category • Price" />
+
+    <TextView
+        android:id="@+id/textFoodDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:lineSpacingExtra="2dp"
+        android:paddingTop="6dp"
+        android:text="Description" />
+
+</LinearLayout>

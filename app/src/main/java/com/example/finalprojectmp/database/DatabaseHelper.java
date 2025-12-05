@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.example.finalprojectmp.models.Attendance;
 import com.example.finalprojectmp.models.Event;
+import com.example.finalprojectmp.models.Food;
 import com.example.finalprojectmp.models.Organizer;
 import com.example.finalprojectmp.models.Participant;
 import com.example.finalprojectmp.models.QRCode;
@@ -26,7 +27,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // Database Info
     private static final String DATABASE_NAME = "EventManagementDB";
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
 
     // Table Names
     public static final String TABLE_USERS = "users";
@@ -530,6 +531,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Event event = null;
         if (cursor.moveToFirst()) {
             event = mapEventFromCursor(cursor);
+            event.setMenus(new ArrayList<>(getFoodsForEvent(event.getId())));
         }
         cursor.close();
         return event;
@@ -560,6 +562,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             event.setUserHasRsvp(cursor.getInt(hasRsvpIndex) > 0);
         }
         return event;
+    }
+
+    private Food mapFoodFromCursor(Cursor cursor) {
+        Food food = new Food();
+        food.setId(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_ID)));
+        food.setName(cursor.getString(cursor.getColumnIndexOrThrow(KEY_FOOD_NAME)));
+        food.setDescription(cursor.getString(cursor.getColumnIndexOrThrow(KEY_FOOD_DESCRIPTION)));
+        food.setPrice(cursor.getDouble(cursor.getColumnIndexOrThrow(KEY_PRICE)));
+        food.setFree(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_IS_FREE)) == 1);
+        food.setCategory(cursor.getString(cursor.getColumnIndexOrThrow(KEY_CATEGORY)));
+        food.setImageUrl(cursor.getString(cursor.getColumnIndexOrThrow(KEY_IMAGE_URL)));
+        food.setAvailable(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_IS_AVAILABLE)) == 1);
+        return food;
     }
 
     public boolean setRsvpStatus(int userId, int eventId, String status) {
@@ -1060,6 +1075,71 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     .append("\n\n");
         }
         return sb.toString();
+    }
+
+
+    public long insertFood(Food food) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_FOOD_NAME, food.getName());
+        values.put(KEY_FOOD_DESCRIPTION, food.getDescription());
+        values.put(KEY_PRICE, food.getPrice());
+        values.put(KEY_IS_FREE, food.isFree() ? 1 : 0);
+        values.put(KEY_CATEGORY, food.getCategory());
+        values.put(KEY_IMAGE_URL, food.getImageUrl());
+        values.put(KEY_IS_AVAILABLE, food.isAvailable() ? 1 : 0);
+        return db.insert(TABLE_FOOD, null, values);
+    }
+
+    public Food getFoodById(int foodId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_FOOD, null, KEY_ID + "=?",
+                new String[]{String.valueOf(foodId)}, null, null, null);
+        Food food = null;
+        if (cursor.moveToFirst()) {
+            food = mapFoodFromCursor(cursor);
+        }
+        cursor.close();
+        return food;
+    }
+
+    public List<Food> getFoodsForEvent(int eventId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT f.* FROM " + TABLE_FOOD + " f " +
+                "INNER JOIN " + TABLE_EVENT_FOOD + " ef ON ef." + KEY_FOOD_ID + " = f." + KEY_ID + " " +
+                "WHERE ef." + KEY_EVENT_ID + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(eventId)});
+        List<Food> foods = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            foods.add(mapFoodFromCursor(cursor));
+        }
+        cursor.close();
+        return foods;
+    }
+
+    public void replaceEventFoods(int eventId, List<Food> foods) {
+        if (eventId <= 0) {
+            return;
+        }
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            db.delete(TABLE_EVENT_FOOD, KEY_EVENT_ID + "=?", new String[]{String.valueOf(eventId)});
+            if (foods != null) {
+                for (Food food : foods) {
+                    if (food == null || food.getId() <= 0) {
+                        continue;
+                    }
+                    ContentValues values = new ContentValues();
+                    values.put(KEY_EVENT_ID, eventId);
+                    values.put(KEY_FOOD_ID, food.getId());
+                    db.insert(TABLE_EVENT_FOOD, null, values);
+                }
+            }
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
     }
 
 

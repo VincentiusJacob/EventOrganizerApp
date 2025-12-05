@@ -70,4 +70,11 @@
     <string name="_0">0</string>
     <string name="qr_code">QR code</string>
     <string name="calendar">calendar</string>
+    <string name="remove_food">Remove food</string>
+    <string name="food_price_free">Free</string>
+    <string name="food_price_template">Rp %.2f</string>
+    <string name="food_section_title">Food Menu</string>
+    <string name="food_description_placeholder">No description provided.</string>
+    <string name="food_category_unknown">General</string>
+    <string name="food_meta_template">%1$s • %2$s</string>
 </resources>

@@ -15,7 +15,7 @@
             android:id="@+id/textFormHeader"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Create New Event"
+            android:text="Add Food Menu"
             android:textSize="24sp"
             android:textStyle="bold"
             android:layout_marginBottom="24dp"/>
@@ -23,11 +23,11 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Event Title"
+            android:hint="Food Name"
             android:layout_marginBottom="16dp">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/inputEventTitle"
+                android:id="@+id/inputFoodName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textCapWords"/>
@@ -44,27 +44,27 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="Date (YYYY-MM-DD)"
+                android:hint="Price (Rp.)"
                 android:layout_marginEnd="8dp">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/inputEventDate"
+                    android:id="@+id/inputFoodPrice"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="date"/>
+                    android:inputType="numberDecimal"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="Time (HH:MM)">
+                android:hint="Category">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/inputEventTime"
+                    android:id="@+id/inputFoodCategory"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="time"/>
+                    android:inputType="text"/>
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
@@ -75,7 +75,7 @@
             android:layout_marginBottom="24dp">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/inputEventDesc"
+                android:id="@+id/inputFoodDesc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textMultiLine"
@@ -84,70 +84,19 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <Button
-            android:id="@+id/btnAddFood"
+            android:id="@+id/btnSaveFood"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:text="+  Add Food"
+            android:layout_height="60dp"
+            android:text="Save Food"
             android:backgroundTint="@color/navBackground"
-            android:textColor="@color/white"
-            android:padding="10dp"
-            android:gravity="center"
-            />
+            android:layout_marginBottom="12dp"/>
 
-        <LinearLayout
-            android:id="@+id/layoutFoodSection"
+        <Button
+            android:id="@+id/btnCancelFood"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone">
-            <TextView
-                android:id="@+id/textFoodHeader"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Food Menus"
-                android:textStyle="bold"
-                android:textSize="18sp"
-                android:layout_marginBottom="8dp"/>
-            <LinearLayout
-                android:id="@+id/layoutFoodList"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:padding="16dp">
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/btnSaveEvent"
-                    android:layout_width="match_parent"
-                    android:layout_height="60dp"
-                    android:layout_weight="1"
-                    android:text="Save Event"
-                    android:backgroundTint="@color/navBackground"/>
-
-                <Button
-                    android:id="@+id/btnDeleteEvent"
-                    android:layout_width="match_parent"
-                    android:layout_height="60dp"
-                    android:layout_weight="1"
-                    android:text="Delete Event"
-                    android:backgroundTint="#D32F2F"
-                    />
-            </LinearLayout>
-
-        </LinearLayout>
+            android:layout_height="60dp"
+            android:text="Cancel"
+            android:backgroundTint="#D32F2F"/>
 
     </LinearLayout>
 </ScrollView>

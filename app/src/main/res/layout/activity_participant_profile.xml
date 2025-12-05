@@ -70,13 +70,13 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:hint="@string/profile_interests_label"
-            app:boxBackgroundMode="outline">
+            app:boxBackgroundMode="outline"
+            app:placeholderText="@string/profile_interests_hint">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editInterests"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/profile_interests_hint"
                 android:inputType="textCapSentences|textMultiLine"
                 android:maxLines="3" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -86,13 +86,13 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:hint="@string/dashboard_dietary_label"
-            app:boxBackgroundMode="outline">
+            app:boxBackgroundMode="outline"
+            app:placeholderText="@string/profile_dietary_hint">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editDietaryPreference"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/profile_dietary_hint"
                 android:inputType="textCapSentences|textMultiLine"
                 android:maxLines="3" />
         </com.google.android.material.textfield.TextInputLayout>

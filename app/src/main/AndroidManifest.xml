@@ -14,64 +14,57 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FinalProjectMP"
         tools:targetApi="31">
-
+        <activity
+            android:name=".activities.FoodFormActivity"
+            android:exported="false" />
         <activity
             android:name=".activities.SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity android:name=".activities.LoginActivity" />
         <activity android:name=".activities.RegisterActivity" />
-
         <activity
             android:name=".activities.MainActivity"
             android:exported="false" />
-
         <activity android:name=".activities.OrganizerDashboardActivity" />
         <activity android:name=".activities.OrganizerManageEventsActivity" />
         <activity android:name=".activities.EventFormActivity" />
         <activity android:name=".activities.OrganizerStatsActivity" />
         <activity android:name=".activities.OrganizerScanActivity" />
-
         <activity
             android:name=".activities.ParticipantDashboardActivity"
             android:exported="false"
             android:label="@string/title_participant_dashboard" />
-
         <activity
             android:name=".activities.EventsListActivity"
             android:exported="false"
             android:label="@string/title_events"
             android:parentActivityName=".activities.ParticipantDashboardActivity" />
-
         <activity
             android:name=".activities.EventDetailActivity"
             android:exported="false"
             android:label="@string/title_event_detail"
             android:parentActivityName=".activities.EventsListActivity" />
-
         <activity
             android:name=".activities.ParticipantQrCodesActivity"
             android:exported="false"
             android:label="@string/title_qr_codes"
             android:parentActivityName=".activities.ParticipantDashboardActivity" />
-
         <activity
             android:name=".activities.QrCodeDetailActivity"
             android:exported="false"
             android:label="@string/title_qr_detail"
             android:parentActivityName=".activities.ParticipantQrCodesActivity" />
-
         <activity
             android:name=".activities.ParticipantProfileActivity"
             android:exported="false"
             android:label="@string/title_profile"
             android:parentActivityName=".activities.ParticipantDashboardActivity" />
-
     </application>
 
 </manifest>
