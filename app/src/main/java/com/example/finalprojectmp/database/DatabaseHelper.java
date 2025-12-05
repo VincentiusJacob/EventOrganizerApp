@@ -938,8 +938,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // Helper buat get events by organizer
     public List<Event> getEventsByOrganizer(int organizerId) {
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT * FROM " + TABLE_EVENTS +
-                " WHERE " + KEY_CREATED_BY + " = ? ORDER BY " + KEY_DATE + " DESC";
+        String query = "SELECT e.*," +
+                " (SELECT COUNT(*) FROM " + TABLE_RSVPS + " r WHERE r." + KEY_EVENT_ID + " = e." + KEY_ID +
+                " AND r." + KEY_STATUS + " = '" + Rsvp.STATUS_CONFIRMED + "') AS total_rsvp," +
+                " (SELECT COUNT(*) FROM " + TABLE_ATTENDANCE + " a WHERE a." + KEY_EVENT_ID + " = e." + KEY_ID +
+                " AND a." + KEY_CHECKED_IN + " = 1) AS total_checked_in" +
+                " FROM " + TABLE_EVENTS + " e" +
+                " WHERE e." + KEY_CREATED_BY + " = ?" +
+                " ORDER BY e." + KEY_DATE + " DESC";
         Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(organizerId)});
         List<Event> events = new ArrayList<>();
         while (cursor.moveToNext()) {
