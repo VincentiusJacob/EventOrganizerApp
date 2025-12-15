@@ -2,6 +2,8 @@ package com.example.finalprojectmp.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.TextView;
 
@@ -18,10 +20,18 @@ import com.example.finalprojectmp.models.Rsvp;
 import com.example.finalprojectmp.utils.EventStatus;
 import com.example.finalprojectmp.utils.EventTimeUtils;
 
+import org.json.JSONObject; // For parsing Weather Data
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ParticipantDashboardActivity extends ParticipantBaseActivity implements ParticipantEventAdapter.EventActionListener {
 
@@ -60,6 +70,9 @@ public class ParticipantDashboardActivity extends ParticipantBaseActivity implem
         recyclerUpcoming.setAdapter(eventAdapter);
 
         setupNavigationBar(R.id.nav_home);
+
+
+        fetchWeatherData();
     }
 
     @Override
@@ -77,13 +90,66 @@ public class ParticipantDashboardActivity extends ParticipantBaseActivity implem
         if (participant == null) {
             return;
         }
+
         textGreeting.setText(getString(R.string.dashboard_greeting, participant.getDisplayName()));
+
         String dietary = participant.getDietaryPreferences();
         if (dietary == null || dietary.isEmpty()) {
             dietary = getString(R.string.dashboard_dietary_empty);
         }
         textDietaryPreference.setText(dietary);
     }
+
+
+    private void fetchWeatherData() {
+
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
+
+        executor.execute(() -> {
+            String tempString = "";
+            try {
+                // API URL (Free Open-Meteo API)
+                // Coordinates for default dulu (Jakarta/Indonesia).
+                String urlString = "https://api.open-meteo.com/v1/forecast?latitude=-6.2088&longitude=106.8456&current_weather=true";
+
+                URL url = new URL(urlString);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+
+                JSONObject jsonResponse = new JSONObject(response.toString());
+                JSONObject currentWeather = jsonResponse.getJSONObject("current_weather");
+                double temperature = currentWeather.getDouble("temperature");
+
+                tempString = temperature + "°C";
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                tempString = "";
+            }
+
+
+            String finalTemp = tempString;
+            handler.post(() -> {
+                Participant participant = databaseHelper.getParticipantById(userId);
+                if (participant != null && !finalTemp.isEmpty()) {
+
+                    String currentText = getString(R.string.dashboard_greeting, participant.getDisplayName());
+                    textDietaryPreference.setText(finalTemp + " • Today");
+                }
+            });
+        });
+    }
+
 
     private void loadDashboardData() {
         List<Event> allEvents = databaseHelper.getEventsForParticipant(userId);

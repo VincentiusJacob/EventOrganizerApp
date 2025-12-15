@@ -1,109 +1,180 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/surfaceBackground"
-    android:padding="20dp">
+    android:background="#F5F5F5"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/textDetailTitle"
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="220dp"
+            android:background="@color/navAccent">
+
+            <ImageView
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_gravity="center"
+                android:alpha="0.15"
+                app:tint="@android:color/white"
+                tools:ignore="ContentDescription" />
+        </FrameLayout>
+
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:textSize="26sp"
-            android:textColor="@color/black"
-            tools:text="Innovation Summit" />
-
-        <TextView
-            android:id="@+id/textDetailDateTime"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="8dp"
-            android:textColor="@color/textSecondary"
-            tools:text="Mon, Oct 7 • 09:00" />
-
-        <TextView
-            android:id="@+id/textDetailOrganizer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/textSecondary"
-            android:paddingTop="4dp"
-            tools:text="Hosted by Admin Organizer" />
-
-        <TextView
-            android:id="@+id/textDetailStats"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/textSecondary"
-            android:paddingTop="8dp"
-            tools:text="35 RSVP • 12 checked in" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/description"
-            android:textColor="@color/black"
-            android:textStyle="bold"
-            android:paddingTop="20dp" />
-
-        <TextView
-            android:id="@+id/textDetailDescription"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            android:lineSpacingExtra="4dp"
-            android:paddingTop="8dp"
-            tools:text="Join us for a showcase of student innovations..." />
-
-        <LinearLayout
-            android:id="@+id/layoutDetailFoodSection"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingTop="20dp"
-            android:visibility="gone">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/food_section_title"
-                android:textStyle="bold"
-                android:textColor="@color/black"
-                android:textSize="18sp" />
+            android:layout_marginTop="-40dp"
+            android:layout_marginBottom="20dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp"
+            app:cardBackgroundColor="@android:color/white">
 
             <LinearLayout
-                android:id="@+id/layoutDetailFoodList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingTop="12dp" />
-        </LinearLayout>
+                android:padding="24dp">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/buttonDetailRsvp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:backgroundTint="@color/navAccent"
-            android:textColor="@color/white"
-            android:text="@string/button_rsvp_now"
-            android:textAllCaps="false"
-            android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/textDetailTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textSize="28sp"
+                    android:fontFamily="serif"
+                    android:textColor="@color/black"
+                    tools:text="Innovation Summit" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/buttonDetailQr"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="@string/button_view_qr"
-            android:textAllCaps="false"
-            android:visibility="gone" />
+                <View
+                    android:layout_width="40dp"
+                    android:layout_height="4dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="12dp"
+                    android:background="@color/navAccent" />
+
+                <TextView
+                    android:id="@+id/textDetailDateTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="12dp"
+                    app:drawableStartCompat="@android:drawable/ic_menu_my_calendar"
+                    android:gravity="center_vertical"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="14sp"
+                    tools:text="Mon, Oct 7 • 09:00" />
+
+                <TextView
+                    android:id="@+id/textDetailOrganizer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:drawablePadding="12dp"
+                    app:drawableStartCompat="@android:drawable/ic_menu_myplaces"
+                    android:gravity="center_vertical"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="14sp"
+                    tools:text="Hosted by Admin Organizer" />
+
+                <TextView
+                    android:id="@+id/textDetailStats"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:background="#F0F0F0"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="6dp"
+                    android:textStyle="bold"
+                    android:textColor="@color/navAccent"
+                    android:textSize="12sp"
+                    tools:text="35 RSVP • 12 checked in" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/description"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:layout_marginTop="24dp" />
+
+                <TextView
+                    android:id="@+id/textDetailDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#424242"
+                    android:textSize="15sp"
+                    android:lineSpacingExtra="6dp"
+                    android:layout_marginTop="8dp"
+                    tools:text="Join us for a showcase of student innovations. We will explore the future of technology and design in this exclusive event." />
+
+                <LinearLayout
+                    android:id="@+id/layoutDetailFoodSection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginTop="24dp"
+                    android:background="#FAFAFA"
+                    android:padding="16dp"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/food_section_title"
+                        android:textStyle="bold"
+                        android:textAllCaps="true"
+                        android:letterSpacing="0.1"
+                        android:textColor="@color/black"
+                        android:textSize="14sp" />
+
+                    <LinearLayout
+                        android:id="@+id/layoutDetailFoodList"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingTop="12dp" />
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/buttonDetailRsvp"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:layout_marginTop="32dp"
+                    android:backgroundTint="@color/navAccent"
+                    android:textColor="@color/white"
+                    android:text="@string/button_rsvp_now"
+                    android:textAllCaps="false"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="30dp"
+                    android:elevation="4dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/buttonDetailQr"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:layout_marginTop="12dp"
+                    android:text="@string/button_view_qr"
+                    android:textAllCaps="false"
+                    android:textSize="16sp"
+                    app:strokeColor="@color/navAccent"
+                    app:strokeWidth="2dp"
+                    android:textColor="@color/navAccent"
+                    app:cornerRadius="30dp"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 </ScrollView>

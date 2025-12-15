@@ -77,4 +77,9 @@
     <string name="food_description_placeholder">No description provided.</string>
     <string name="food_category_unknown">General</string>
     <string name="food_meta_template">%1$s • %2$s</string>
+
+
+    <string name="label_rsvp">RSVP</string>
+    <string name="label_checked_in">CHECKED IN</string>
+    <string name="label_hosted_by">HOSTED BY</string>
 </resources>

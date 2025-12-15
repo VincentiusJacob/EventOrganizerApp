@@ -1,25 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="12dp"
+    android:layout_marginBottom="16dp"
+    android:layout_marginHorizontal="4dp"
+    app:cardCornerRadius="24dp"
+    app:cardElevation="6dp"
+    app:cardBackgroundColor="@android:color/white"
     android:foreground="?attr/selectableItemBackground"
     android:clickable="true"
-    android:focusable="true"
-    android:padding="16dp">
+    android:focusable="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        >
+        android:padding="20dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center_vertical"
+            android:gravity="top"
             android:baselineAligned="false">
 
             <TextView
@@ -28,8 +32,11 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:textStyle="bold"
-                android:textSize="18sp"
+                android:textSize="20sp"
+                android:fontFamily="serif"
                 android:textColor="@color/black"
+                android:lineSpacingExtra="2dp"
+                android:layout_marginEnd="8dp"
                 tools:text="Innovation Summit" />
 
             <TextView
@@ -38,46 +45,77 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_status_chip"
                 android:textColor="@color/white"
-                android:textSize="12sp"
+                android:textSize="11sp"
+                android:textAllCaps="true"
+                android:letterSpacing="0.05"
                 android:textStyle="bold"
+                android:gravity="center"
                 android:paddingHorizontal="12dp"
-                android:paddingVertical="4dp"
+                android:paddingVertical="6dp"
                 tools:text="Upcoming" />
         </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#F0F0F0"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp" />
 
         <TextView
             android:id="@+id/textEventDateTime"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/textSecondary"
-            android:paddingTop="4dp"
+            android:textSize="14sp"
+            android:gravity="center_vertical"
+            android:drawablePadding="12dp"
+            app:drawableStartCompat="@android:drawable/ic_menu_my_calendar"
+            app:drawableTint="@color/navAccent"
             tools:text="Mon, Oct 7 • 09:00" />
 
         <TextView
             android:id="@+id/textEventOrganizer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
             android:textColor="@color/textSecondary"
-            android:paddingTop="2dp"
+            android:textSize="14sp"
+            android:gravity="center_vertical"
+            android:drawablePadding="12dp"
+            app:drawableStartCompat="@android:drawable/ic_menu_myplaces"
+            app:drawableTint="@color/navAccent"
             tools:text="Hosted by Admin" />
 
         <TextView
             android:id="@+id/textEventAttendance"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/textSecondary"
-            android:paddingTop="2dp"
+            android:layout_marginTop="12dp"
+            android:textColor="@color/navAccent"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:gravity="center_vertical"
+            android:drawablePadding="10dp"
+
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="6dp"
+            app:drawableStartCompat="@android:drawable/ic_menu_sort_by_size"
+            app:drawableTint="@color/navAccent"
             tools:text="35 RSVP • 12 checked in" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonPrimaryAction"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_height="54dp"
+            android:layout_marginTop="20dp"
             android:text="@string/button_rsvp_now"
             android:textAllCaps="false"
+            android:textSize="15sp"
+            android:elevation="0dp"
             android:backgroundTint="@color/navAccent"
             android:textColor="@color/white"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            app:cornerRadius="27dp" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
